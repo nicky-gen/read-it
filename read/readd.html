@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Read This</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .intro-screen {
+            text-align: center;
+            color: #fff;
+            opacity: 1;
+            transition: opacity 0.8s ease;
+            z-index: 10;
+        }
+
+        .intro-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .intro-text {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .read-button {
+            background: #fff;
+            color: #1a1a1a;
+            padding: 12px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .read-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .note-container {
+            position: absolute;
+            opacity: 0;
+            transform: scale(0.5) rotateX(0deg);
+            transition: all 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            pointer-events: none;
+        }
+
+        .note-container.show {
+            opacity: 1;
+            transform: scale(1) rotateX(0deg);
+            pointer-events: auto;
+        }
+
+        .notebook-paper {
+            background: 
+                repeating-linear-gradient(
+                    transparent,
+                    transparent 31px,
+                    #94b8e8 31px,
+                    #94b8e8 32px
+                ),
+                linear-gradient(
+                    to right,
+                    #ff6b6b 0px,
+                    #ff6b6b 2px,
+                    transparent 2px,
+                    transparent 80px
+                ),
+                linear-gradient(to bottom, #fff 0%, #f8f8f8 100%);
+            width: 450px;
+            min-height: 550px;
+            padding: 40px 50px 40px 90px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+            position: relative;
+            border-radius: 5px;
+            transform-style: preserve-3d;
+        }
+
+        /* Garis margin merah di kiri */
+        .notebook-paper::before {
+            content: '';
+            position: absolute;
+            left: 80px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #ff6b6b;
+        }
+
+        .note-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #2d2d2d;
+            position: relative;
+            z-index: 2;
+        }
+
+        .note-text p {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Efek bayangan halaman */
+        .notebook-paper::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 5px;
+            z-index: -1;
+            transform: translateZ(-10px);
+        }
+
+        /* Signature */
+        .signature {
+            text-align: right;
+            font-style: italic;
+            margin-top: 2rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .signature.show {
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .notebook-paper {
+                width: 95%;
+                max-width: 380px;
+                padding: 35px 25px 35px 70px;
+                min-height: 500px;
+            }
+
+            .intro-text {
+                font-size: 1.1rem;
+                padding: 0 20px;
+            }
+
+            .note-text {
+                font-size: 0.95rem;
+                line-height: 1.7;
+            }
+
+            .read-button {
+                padding: 10px 35px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .notebook-paper {
+                width: 92%;
+                max-width: 340px;
+                padding: 30px 20px 30px 60px;
+            }
+
+            .intro-text {
+                font-size: 1rem;
+            }
+
+            .note-text {
+                font-size: 0.85rem;
+                line-height: 1.6;
+            }
+
+            .note-text p {
+                margin-bottom: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Background Music -->
+        <!-- CARA MENAMBAHKAN LAGU "About You - The 1975":
+             1. Download lagu "About You - The 1975" dalam format MP3
+             2. Letakkan file MP3 di folder yang sama dengan file HTML ini
+             3. Ganti "about-you.mp3" di bawah dengan nama file lagu Anda
+             ATAU gunakan link YouTube/Spotify jika ingin embed
+        -->
+        <audio id="bgMusic" loop>
+            <source src="about-you.mp3" type="audio/mpeg">
+            <!-- Alternatif: Anda bisa upload lagu ke layanan hosting seperti:
+                 - Google Drive (buat link shareable)
+                 - Dropbox
+                 - OneDrive
+                 Lalu paste linknya di src="" 
+            -->
+        </audio>
+
+        <!-- Layar Intro -->
+        <div class="intro-screen" id="introScreen">
+            <p class="intro-text">i hope you read this, even if it's too late.</p>
+            <button class="read-button" onclick="showNote()">read it</button>
+        </div>
+
+        <!-- Kertas Notes -->
+        <div class="note-container" id="noteContainer">
+            <div class="notebook-paper">
+                <div class="note-text" id="noteText">
+                    <!-- Paragraf akan diisi oleh JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Teks yang akan ditampilkan
+        const paragraphs = [
+            "I don't even know if you'll ever read this.",
+            "But if you do… I just want you to know, I still think about you hehe....",
+            "We both tried. We both cared. But the universe just never gave us enough space to become \"us.\"",
+            "I just wonder… if we had met at a different point in life, would the ending have been different?...",
+            "Anyway, i hope you're doing okaaay hehee, love u much prilll :3"
+        ];
+
+        const signature = "- (♡)";
+
+        function showNote() {
+            const introScreen = document.getElementById('introScreen');
+            const noteContainer = document.getElementById('noteContainer');
+            const bgMusic = document.getElementById('bgMusic');
+            
+            // Play music
+            bgMusic.play().catch(e => console.log('Audio autoplay prevented'));
+            
+            // Fade out intro
+            introScreen.classList.add('fade-out');
+            
+            // Delay untuk menampilkan note
+            setTimeout(() => {
+                noteContainer.classList.add('show');
+                setTimeout(() => {
+                    typeAllParagraphs();
+                }, 500);
+            }, 800);
+        }
+
+        function typeAllParagraphs() {
+            const noteText = document.getElementById('noteText');
+            
+            // Buat elemen untuk setiap paragraf
+            const pElements = paragraphs.map(text => {
+                const p = document.createElement('p');
+                noteText.appendChild(p);
+                return { element: p, text: text };
+            });
+            
+            // Tambahkan signature
+            const sigElement = document.createElement('div');
+            sigElement.className = 'signature';
+            noteText.appendChild(sigElement);
+            
+            let currentParagraph = 0;
+            
+            function typeNextParagraph() {
+                if (currentParagraph >= pElements.length) {
+                    // Semua selesai, tampilkan signature
+                    setTimeout(() => {
+                        sigElement.textContent = signature;
+                        sigElement.classList.add('show');
+                    }, 300);
+                    return;
+                }
+                
+                const p = pElements[currentParagraph];
+                let charIndex = 0;
+                
+                const typingInterval = setInterval(() => {
+                    if (charIndex < p.text.length) {
+                        p.element.textContent += p.text[charIndex];
+                        charIndex++;
+                    } else {
+                        clearInterval(typingInterval);
+                        currentParagraph++;
+                        // Delay sebentar sebelum paragraf berikutnya
+                        setTimeout(() => {
+                            typeNextParagraph();
+                        }, 200);
+                    }
+                }, 50); // 50ms per karakter
+            }
+            
+            typeNextParagraph();
+        }
+
+        // Efek 3D mengikuti mouse
+        document.addEventListener('mousemove', (e) => {
+            const noteContainer = document.getElementById('noteContainer');
+            if (noteContainer.classList.contains('show')) {
+                const x = (window.innerWidth / 2 - e.clientX) / 50;
+                const y = (window.innerHeight / 2 - e.clientY) / 50;
+                
+                noteContainer.style.transform = `
+                    scale(1) 
+                    rotateY(${x}deg) 
+                    rotateX(${y}deg)
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
